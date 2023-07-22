@@ -1,0 +1,18 @@
+data:
+  train_data_path: 'C:\Users\kfirs\PycharmProjects\FinalProject\data\data_sets\Development\first_set\train'
+  val_data_path: 'C:\Users\kfirs\PycharmProjects\FinalProject\data\data_sets\Development\first_set\val'
+  batch_size: 8
+  num_workers: 8
+
+model:
+  model_name: 'CNNModel'  # specify the model to use here
+  num_classes: 10  # specify the number of classes in your handwriting data
+
+module:
+  lr: 0.001
+
+trainer:
+  accelerator: 'cpu'
+  max_epochs: 10
+  gpus: 1
+  log_every_n_steps: 10
