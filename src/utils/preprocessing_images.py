@@ -109,9 +109,12 @@ def split_image_to_sets(image_file: str, mat_file: str, train_ratio: float, outp
 
 # Usage:
 if __name__ == '__main__':
+    K = 40
     data_dark_lines_path = r'C:\Users\kfirs\PycharmProjects\FinalProject\data\raw_data\Development\DataDarkLines'
-    data_median_bw_path = r'C:\Users\kfirs\PycharmProjects\FinalProject\data\raw_data\Development\ImagesMedianBW'
-    for image_file, dark_lines_mat in zip(Path(data_median_bw_path).glob('*.jpg'),
-                                          Path(data_dark_lines_path).glob('*.mat')):
+    data_median_bw_path = r'C:\Users\kfirs\PycharmProjects\FinalProject\data\raw_data\ImagesLinesRemovedBW'
+    for index, (image_file, dark_lines_mat) in enumerate(zip(Path(data_median_bw_path).glob('*.jpg'),
+                                          Path(data_dark_lines_path).glob('*.mat'))):
+        if index == K:
+            break
         split_image_to_sets(str(image_file), str(dark_lines_mat), 0.8,
                             r'C:\Users\kfirs\PycharmProjects\FinalProject\data\data_sets\Development\first_set')
