@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy as np
 
+
 class SplitAndStackImageToSquare(object):
     def __call__(self, img):
         # Your function code here:
@@ -26,3 +27,9 @@ class SplitAndStackImageToSquare(object):
             stacked_img.paste(part, (0, i * height))
 
         return stacked_img
+
+
+if __name__ == '__main__':
+
+    # Usage
+    pass

@@ -1,20 +1,17 @@
 data:
-  train_data_path: 'C:\Users\kfirs\PycharmProjects\FinalProject\data\data_sets\Development\first_set\train'
-  val_data_path: 'C:\Users\kfirs\PycharmProjects\FinalProject\data\data_sets\Development\first_set\val'
-  batch_size: 16
+  batch_size: 32
+  image_size: 128
+  mean: 0.9432905912399292
   num_workers: 8
-
+  std: 0.133747398853302
+  train_data_path: /homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Development/first_set_204_text_detection_filtering/train
+  val_data_path: /homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Development/first_set_204_text_detection_filtering/val
+  test_data_path: /homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Development/first_set_204_text_detection_filtering/test
 model:
-  model_name: 'CNNModel'  # specify the model to use here
-  num_classes: 40  # specify the number of classes in your handwriting data
-
+  model_name: CNNModel
+  num_classes: 204
 module:
-  lr: 0.001
-
+  learning_rate: 0.001
 trainer:
-  accelerator: 'cpu'
-  max_epochs: 30
-  gpus: 1
-  log_every_n_steps: 10
-  precision: 16
-
+  max_epochs: 300
+  precision: "16-mixed"

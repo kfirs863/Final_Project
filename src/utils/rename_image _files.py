@@ -21,5 +21,9 @@ def rename_files(path, file_extension='jpg'):
         print(f'Renamed file {old_file_path} to {new_file_path}')
 
 # usage example:
-rename_files(r'C:\Users\kfirs\PycharmProjects\FinalProject\data\original_data\5_DataDarkLines', 'mat')
+rename_files(r'C:\Users\kfirs\PycharmProjects\FinalProject\data\raw_data\1_ImagesRotated', 'jpg')
+rename_files(r'C:\Users\kfirs\PycharmProjects\FinalProject\data\raw_data\2_ImagesMedianBW', 'jpg')
+rename_files(r'C:\Users\kfirs\PycharmProjects\FinalProject\data\raw_data\3_ImagesLinesRemovedBW', 'jpg')
+rename_files(r'C:\Users\kfirs\PycharmProjects\FinalProject\data\raw_data\4_ImagesLinesRemoved', 'jpg')
+rename_files(r'C:\Users\kfirs\PycharmProjects\FinalProject\data\raw_data\5_DataDarkLines', 'mat')
 

@@ -1,9 +1,8 @@
-from pathlib import Path
-
 import cv2
 import numpy as np
-from scipy.io import loadmat
 import os
+from pathlib import Path
+from scipy.io import loadmat
 
 
 def load_data(image_file, mat_file):
@@ -16,15 +15,63 @@ def load_data(image_file, mat_file):
     return img, data
 
 
-def is_mostly_white(img, row_threshold=0.90, pixel_threshold=0.95):
+def detect_edges_in_image_with_border_exclude(img_np, threshold=220, border_exclude=700):
+    """
+    Detect edges in the middle row of an image, excluding pixels from the borders.
+
+    Parameters:
+    - img_np: numpy ndarray of the image (grayscale)
+    - threshold: Color difference to consider an edge
+    - border_exclude: Number of pixels to exclude from both left and right borders
+
+    Returns:
+    - int: Number of edges detected
+    """
+
+    # Extract the first third of
+    middle_row = 2*(img_np.shape[0] // 3)
+    pixels = img_np[middle_row, border_exclude:-border_exclude]
+
+    # Compute the difference between adjacent pixels and count edges
+    edge_count = 0
+    for i in range(1, len(pixels)):
+        if abs(pixels[i] - pixels[i - 1]) > threshold:
+            edge_count += 1
+
+    return edge_count
+
+
+def contains_text(img, edge_threshold=50, color_difference_threshold=180):
+    """
+    Check if the image contains text based on the number of detected edges.
+
+    Parameters:
+    - img: PIL Image object
+    - edge_threshold: Number of edges that indicates the presence of text
+    - color_difference_threshold: Color difference to consider an edge
+
+    Returns:
+    - bool: True if the image likely contains text, False otherwise
+    """
+    # Count the number of edges in the image
+    num_edges = detect_edges_in_image_with_border_exclude(img, color_difference_threshold)
+
+    # Check if the number of edges exceeds the given threshold
+    return num_edges > edge_threshold
+
+def is_mostly_white(img, row_threshold=0.87, p_t=0.97, border_exclude=700):
+    """
+    Check if the image is mostly white.
+    """
     white_rows = 0
+    img = img[:, border_exclude:-border_exclude]
     for row in img:
-        if np.mean(row) / 255 >= pixel_threshold:  # if row is mostly white
+        if np.mean(row) / 255 >= p_t:  # if row is mostly white
             white_rows += 1
     return (white_rows / img.shape[0]) >= row_threshold
 
 
-def split_rows(img, train_ratio, peaks_indices, test_indices):
+def split_rows(img, train_ratio, peaks_indices, test_indices, p_t):
     data = []
 
     # iterate the rows in the image by the data['peaks_indices'] values
@@ -35,9 +82,9 @@ def split_rows(img, train_ratio, peaks_indices, test_indices):
         if peaks_indices[i] == test_indices[0] or peaks_indices[i] == test_indices[1]:
             continue
 
-        # check row image contain some text
-        if is_mostly_white(row):
-            print(f'row {i} is mostly white')
+        # skip if row is not contain text
+        if not contains_text(row) or is_mostly_white(row, p_t):
+            print(f'row {i} not conatain text')
             # display image
             # cv2.imshow('image', row)
             # cv2.waitKey(0)
@@ -77,7 +124,7 @@ def save_rows(rows, folder, prefix, label, source_type):
         cv2.imwrite(os.path.join(folder, prefix, label, f'{source_type}_row_{i}.jpg'), row)
 
 
-def split_image_to_sets(image_file: str, mat_file: str, train_ratio: float, output_folder: str):
+def split_image_to_sets(image_file: str, mat_file: str, train_ratio: float, output_folder: str, p_t: float):
     # use Pathlib to assert that the image and mat files exist
     assert Path(image_file).exists(), f'Image file {image_file} does not exist'
     assert Path(mat_file).exists(), f'Mat file {mat_file} does not exist'
@@ -98,7 +145,7 @@ def split_image_to_sets(image_file: str, mat_file: str, train_ratio: float, outp
     img, data = load_data(image_file, mat_file)
     peaks_indices = data['peaks_indices']
     test_indices = (data['top_test_area'].flatten()[0], data['bottom_test_area'].flatten()[0])
-    train_rows, val_rows, test_row = split_rows(img, train_ratio, peaks_indices, test_indices)
+    train_rows, val_rows, test_row = split_rows(img, train_ratio, peaks_indices, test_indices, p_t)
 
     save_rows(train_rows, output_folder, 'train', label, source_type)
     save_rows(val_rows, output_folder, 'val', label, source_type)
@@ -109,12 +156,34 @@ def split_image_to_sets(image_file: str, mat_file: str, train_ratio: float, outp
 
 # Usage:
 if __name__ == '__main__':
-    K = 40
-    data_dark_lines_path = r'C:\Users\kfirs\PycharmProjects\FinalProject\data\raw_data\Development\DataDarkLines'
-    data_median_bw_path = r'C:\Users\kfirs\PycharmProjects\FinalProject\data\raw_data\ImagesLinesRemovedBW'
-    for index, (image_file, dark_lines_mat) in enumerate(zip(Path(data_median_bw_path).glob('*.jpg'),
-                                          Path(data_dark_lines_path).glob('*.mat'))):
-        if index == K:
-            break
-        split_image_to_sets(str(image_file), str(dark_lines_mat), 0.8,
-                            r'C:\Users\kfirs\PycharmProjects\FinalProject\data\data_sets\Development\first_set')
+    K = 204
+    dev_raw_data_paths_dict = {
+        'data_rotated_path': {
+            'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Development/1_ImagesRotated',
+            'pixel_threshold': 0.96},
+        'data_median_bw_path': {
+            'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Development/2_ImagesMedianBW',
+            'pixel_threshold': 0.96},
+        'data_lines_removed_median_bw_path': {
+            'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Development/3_ImagesLinesRemovedBW',
+            'pixel_threshold': 0.97},
+        'data_lines_removed_path': {
+            'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Development/4_ImagesLinesRemoved',
+            'pixel_threshold': 0.97}
+    }
+
+
+
+    output_folder = fr'/homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Development/first_set_{K}_text_detection_filtering'
+    data_dark_lines_path = r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Development/5_DataDarkLines'
+    # iterate over the dev_raw_data_paths_dict
+    for key, value in dev_raw_data_paths_dict.items():
+        raw_data_path = value['path']
+        pixel_threshold = value['pixel_threshold']
+        # iterate over the raw data path
+
+        for index, (image_file, dark_lines_mat) in enumerate(zip(Path(raw_data_path).glob('*.jpg'),
+                                                                 Path(data_dark_lines_path).glob('*.mat'))):
+            if index == K:
+                break
+            split_image_to_sets(str(image_file), str(dark_lines_mat), 0.8, output_folder, p_t=pixel_threshold)
