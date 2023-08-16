@@ -13,5 +13,13 @@ model:
 module:
   learning_rate: 0.001
 trainer:
-  max_epochs: 300
+  max_epochs: 150
   precision: "16-mixed"
+scheduler:
+  monitor: 'train_accuracy'
+  mode: 'max'
+  factor: 0.5
+  patience: 6
+  threshold: 1e-2
+  min_lr: 1e-6
+

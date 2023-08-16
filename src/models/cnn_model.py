@@ -32,12 +32,12 @@ class CNNModel(nn.Module):
             self.feature_dim = self._get_conv_out(dummy).view(1, -1).size(1)
 
         self.classifier = nn.Sequential(
-            nn.Linear(self.feature_dim, 256),
+            nn.Linear(self.feature_dim, 512),
             nn.ReLU(inplace=True),
             nn.Dropout(p=dropout),
-            nn.Linear(256, 512),
+            nn.Linear(512, 1024),
             nn.ReLU(inplace=True),
-            nn.Linear(512, num_classes),
+            nn.Linear(1024, num_classes),
         )
 
     def _get_conv_out(self, x):
