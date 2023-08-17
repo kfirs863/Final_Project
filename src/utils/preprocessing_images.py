@@ -156,26 +156,26 @@ def split_image_to_sets(image_file: str, mat_file: str, train_ratio: float, outp
 
 # Usage:
 if __name__ == '__main__':
-    K = 204
+    K = 203
     dev_raw_data_paths_dict = {
         'data_rotated_path': {
-            'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Development/1_ImagesRotated',
+            'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Testing/1_ImagesRotated',
             'pixel_threshold': 0.96},
         'data_median_bw_path': {
-            'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Development/2_ImagesMedianBW',
+            'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Testing/2_ImagesMedianBW',
             'pixel_threshold': 0.96},
         'data_lines_removed_median_bw_path': {
-            'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Development/3_ImagesLinesRemovedBW',
+            'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Testing/3_ImagesLinesRemovedBW',
             'pixel_threshold': 0.97},
         'data_lines_removed_path': {
-            'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Development/4_ImagesLinesRemoved',
+            'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Testing/4_ImagesLinesRemoved',
             'pixel_threshold': 0.97}
     }
 
 
 
-    output_folder = fr'/homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Development/first_set_{K}_text_detection_filtering'
-    data_dark_lines_path = r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Development/5_DataDarkLines'
+    output_folder = fr'/homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Testing/testing_set_{K}_text_detection_filtering'
+    data_dark_lines_path = r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Testing/5_DataDarkLines'
     # iterate over the dev_raw_data_paths_dict
     for key, value in dev_raw_data_paths_dict.items():
         raw_data_path = value['path']

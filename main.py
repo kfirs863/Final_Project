@@ -68,13 +68,14 @@ def main(config):
         api_key="jsPqM9osr1ZfIKWiEeiAlitCa",
         workspace="final-project",
         project_name="hand-writing-classification",
+        experiment_name="Testing_dataset_203_classes",
     )
 
     # log_class_distribution for each dataset
     list(map(lambda dataset: log_class_distribution(dataset, comet_logger), [train_dataset, val_dataset, test_dataset]))
 
     # log config dict to comet as assets
-    comet_logger.experiment.log_asset_data(config)(config)
+    comet_logger.experiment.log_asset_data(config)
 
     # log model class source code to comet as assets
     comet_logger.experiment.log_code("src/models/cnn_model.py")
@@ -111,6 +112,7 @@ def main(config):
 
     for checkpoint_path in checkpoint_callback.best_k_models.keys():
         comet_logger.experiment.log_asset(checkpoint_path)
+
 
     # Evaluate model
     trainer.test(lightning_module)
