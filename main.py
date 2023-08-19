@@ -28,10 +28,8 @@ model_dict = {
 
 
 def main(config):
-    # get std and mean from config
-    std = config["data"]["std"]
-    mean = config["data"]["mean"]
 
+    # Set image size
     IMAGE_SIZE = config["data"]["image_size"]
 
     # Common preprocessing transformations
@@ -62,30 +60,16 @@ def main(config):
     # Initialize model
     model = ModelClass(num_classes=config["model"]["num_classes"])
 
+    # Initialize lightning module
     lightning_module = HandwritingClassifier(model, config, train_dataset, val_dataset, test_dataset)
 
+    # Define a CometLogger callback
     comet_logger = CometLogger(
         api_key="jsPqM9osr1ZfIKWiEeiAlitCa",
         workspace="final-project",
         project_name="hand-writing-classification",
-        experiment_name="Testing_dataset_203_classes",
+        # experiment_name="Testing_dataset_203_classes_last_layer_removed",
     )
-
-    # log_class_distribution for each dataset
-    list(map(lambda dataset: log_class_distribution(dataset, comet_logger), [train_dataset, val_dataset, test_dataset]))
-
-    # log config dict to comet as assets
-    comet_logger.experiment.log_asset_data(config)
-
-    # log model class source code to comet as assets
-    comet_logger.experiment.log_code("src/models/cnn_model.py")
-
-    # log lightning module source code to comet as assets
-    comet_logger.experiment.log_code('./src/lightning_module.py')
-
-    # Log total number of model parameters
-    comet_logger.experiment.log_metric("num_model_parameters",
-                                       sum(p.numel() for p in model.parameters() if p.requires_grad))
 
     # Define a LearningRateMonitor callback
     lr_monitor = LearningRateMonitor(logging_interval='epoch')
@@ -104,23 +88,49 @@ def main(config):
         logger=comet_logger,
         callbacks=[lr_monitor, checkpoint_callback],
         profiler="Simple",
+        log_every_n_steps=config["trainer"]["log_every_n_steps"],
         precision=config["trainer"]["precision"],
     )
+
+
+    # log_class_distribution for each dataset
+    list(map(lambda dataset: log_class_distribution(dataset, comet_logger), [train_dataset, val_dataset, test_dataset]))
+
+    # log config dict to comet as assets
+    comet_logger.experiment.log_asset_data(config)
+
+    # log model class source code to comet as assets
+    comet_logger.experiment.log_code("src/models/cnn_model.py")
+
+    # log lightning module source code to comet as assets
+    comet_logger.experiment.log_code('./src/lightning_module.py')
+
+    # Log total number of model parameters
+    comet_logger.experiment.log_metric("num_model_parameters",
+                                       sum(p.numel() for p in model.parameters() if p.requires_grad))
 
     # Fit model
     trainer.fit(lightning_module)
 
+    # Log best model to Comet ML
     for checkpoint_path in checkpoint_callback.best_k_models.keys():
         comet_logger.experiment.log_asset(checkpoint_path)
-
 
     # Evaluate model
     trainer.test(lightning_module)
 
+    # End Comet ML experiment
     comet_logger.experiment.end()
 
 
 def log_class_distribution(dataset: ImageFolder, comet_logger):
+    """
+    Log class distribution for a PyTorch ImageFolder dataset using Plotly.
+    :param dataset:  dataset to calculate class distribution for
+    :param comet_logger: comet logger
+    :return: None
+    """
+
     # Get the class labels from the dataset
     class_counts = Counter(dataset.targets)
 
@@ -152,10 +162,9 @@ if __name__ == "__main__":
     # Set COMET_GIT_DIRECTORY environment variable
     os.environ["COMET_GIT_DIRECTORY"] = str('/homes/kfirs/PycharmProjects/FinalProject')
 
-
+    # Load config file
     with open("config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
-    # Initialize optimizer using the configuration
-    # opt = Optimizer("optimizer.yaml", project_name="optimizer-search-01")
+
     main(config)

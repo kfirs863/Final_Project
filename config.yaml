@@ -4,17 +4,18 @@ data:
   mean: 0.9432905912399292
   num_workers: 8
   std: 0.133747398853302
-  train_data_path: /homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Testing/testing_set_203_text_detection_filtering/train
-  val_data_path: /homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Testing/testing_set_203_text_detection_filtering/val
-  test_data_path: /homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Testing/testing_set_203_text_detection_filtering/test
+  train_data_path: /homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Development/first_set_204_text_detection_filtering/train
+  val_data_path: /homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Development/first_set_204_text_detection_filtering/val
+  test_data_path: /homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Development/first_set_204_text_detection_filtering/test
 model:
   model_name: CNNModel
-  num_classes: 203
+  num_classes: 204
 module:
   learning_rate: 0.001
 trainer:
   max_epochs: 150
   precision: "16-mixed"
+  log_every_n_steps: 10
 scheduler:
   monitor: 'train_accuracy'
   mode: 'max'

@@ -14,6 +14,8 @@ class HandwritingClassifier(pl.LightningModule):
         super(HandwritingClassifier, self).__init__()
         self.model = model
         self.config = config
+        self.batch_size = config["data"]["batch_size"]
+        self.num_classes = self.config["model"]["num_classes"]
         self.save_hyperparameters(ignore=['model'])
 
         self.train_dataset = train_dataset
@@ -26,16 +28,12 @@ class HandwritingClassifier(pl.LightningModule):
         self.test_loss = CrossEntropyLoss()  # test loss function
 
         # Define metrics
-        self.train_accuracy = torchmetrics.classification.Accuracy(task="multiclass", num_classes=self.config["model"][
-            "num_classes"])  # train accuracy metric
-        self.val_accuracy = torchmetrics.classification.Accuracy(task="multiclass", num_classes=self.config["model"][
-            "num_classes"])  # val accuracy metric
-        self.test_accuracy = torchmetrics.classification.Accuracy(task="multiclass", num_classes=self.config["model"][
-            "num_classes"])  # test accuracy metric
+        self.train_accuracy = torchmetrics.classification.Accuracy(task="multiclass", num_classes=self.num_classes)  # train accuracy metric
+        self.val_accuracy = torchmetrics.classification.Accuracy(task="multiclass", num_classes=self.num_classes)  # val accuracy metric
+        self.test_accuracy = torchmetrics.classification.Accuracy(task="multiclass", num_classes=self.num_classes)  # test accuracy metric
 
         # Define confusion matrix metric for test
-        self.confusion_matrix_metric = ConfusionMatrix(num_classes=self.config["model"]["num_classes"],
-                                                       task="multiclass")
+        self.confusion_matrix_metric = ConfusionMatrix(num_classes=self.num_classes,task="multiclass")
 
         # Extract class names from ImageFolder
         if isinstance(train_dataset, ImageFolder):
@@ -44,13 +42,13 @@ class HandwritingClassifier(pl.LightningModule):
             self.class_names = None  # Handle case where train_dataset is not an ImageFolder
 
     def train_dataloader(self):
-        return DataLoader(self.train_dataset, batch_size=self.config["data"]["batch_size"], shuffle=True, num_workers=8)
+        return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=8)
 
     def val_dataloader(self):
-        return DataLoader(self.val_dataset, batch_size=self.config['data']['batch_size'], shuffle=False, num_workers=8)
+        return DataLoader(self.val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=8)
 
     def test_dataloader(self):
-        return DataLoader(self.test_dataset, batch_size=self.config['data']['batch_size'], shuffle=False, num_workers=8)
+        return DataLoader(self.test_dataset, batch_size=self.batch_size, shuffle=False, num_workers=8)
 
     def forward(self, x):
         return self.model(x)

@@ -3,13 +3,13 @@ import torch.nn as nn
 
 
 class CNNModel(nn.Module):
-    def __init__(self, num_classes=10 , dropout=0.5):  # adjust the number of classes
+    def __init__(self, num_classes=10 , dropout=0.5):
         super(CNNModel, self).__init__()
 
         self.features = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=5, stride=1, padding=1),
-            nn.ReLU(inplace=True),
             nn.BatchNorm2d(32),
+            nn.ReLU(inplace=True),
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
@@ -18,13 +18,11 @@ class CNNModel(nn.Module):
             nn.MaxPool2d(kernel_size=3, stride=2),
             nn.Conv2d(128, 196, kernel_size=3, stride=1),
             nn.ReLU(inplace=True),
-            # nn.Conv2d(196, 256, kernel_size=2, stride=1),
-            # nn.ReLU(inplace=True),
             nn.BatchNorm2d(196),
             nn.MaxPool2d(kernel_size=2, stride=2),
         )
 
-        self.avgpool = nn.AdaptiveAvgPool2d((4, 4))
+        self.avgpool = nn.AdaptiveAvgPool2d(1)
 
         # calculate shape by doing one forward pass
         with torch.no_grad():
@@ -35,9 +33,9 @@ class CNNModel(nn.Module):
             nn.Linear(self.feature_dim, 512),
             nn.ReLU(inplace=True),
             nn.Dropout(p=dropout),
-            nn.Linear(512, 1024),
+            nn.Linear(512, 256),
             nn.ReLU(inplace=True),
-            nn.Linear(1024, num_classes),
+            nn.Linear(256, num_classes),
         )
 
     def _get_conv_out(self, x):
