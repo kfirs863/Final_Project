@@ -65,7 +65,7 @@ def main(config):
 
     # Define a CometLogger callback
     comet_logger = CometLogger(
-        api_key="jsPqM9osr1ZfIKWiEeiAlitCa",
+        api_key="xxxxxxxxxx",
         workspace="final-project",
         project_name="hand-writing-classification",
         save_dir='/homes/kfirs/PycharmProjects/FinalProject/comet_logs/'
