@@ -172,7 +172,7 @@ if __name__ == "__main__":
     os.environ["COMET_GIT_DIRECTORY"] = str('/homes/kfirs/PycharmProjects/FinalProject')
 
     # Load config file
-    with open("config.yaml", "r") as f:
+    with open("develop_config.yaml", "r") as f:
         config = yaml.safe_load(f)
 
 
