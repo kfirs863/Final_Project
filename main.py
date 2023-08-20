@@ -1,5 +1,5 @@
 import os
-
+import time
 import comet_ml
 from pathlib import Path
 from collections import Counter
@@ -58,7 +58,7 @@ def main(config):
     ModelClass = model_dict[config["model"]["model_name"]]
 
     # Initialize model
-    model = ModelClass(num_classes=config["model"]["num_classes"])
+    model = ModelClass(num_classes=config["model"]["num_classes"],image_size=IMAGE_SIZE)
 
     # Initialize lightning module
     lightning_module = HandwritingClassifier(model, config, train_dataset, val_dataset, test_dataset)
@@ -68,6 +68,7 @@ def main(config):
         api_key="jsPqM9osr1ZfIKWiEeiAlitCa",
         workspace="final-project",
         project_name="hand-writing-classification",
+        save_dir='/homes/kfirs/PycharmProjects/FinalProject/comet_logs/'
         # experiment_name="Testing_dataset_203_classes_last_layer_removed",
     )
 
@@ -98,6 +99,14 @@ def main(config):
 
     # log config dict to comet as assets
     comet_logger.experiment.log_asset_data(config)
+
+    # sleep for 1 second to allow comet to sync
+    time.sleep(1)
+
+    comet_logger.log_hyperparams(config)
+
+    # sleep for 1 second to allow comet to sync
+    time.sleep(1)
 
     # log model class source code to comet as assets
     comet_logger.experiment.log_code("src/models/cnn_model.py")

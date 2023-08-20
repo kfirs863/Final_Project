@@ -3,22 +3,22 @@ import torch.nn as nn
 
 
 class CNNModel(nn.Module):
-    def __init__(self, num_classes=10 , dropout=0.5):
+    def __init__(self, num_classes=10 ,image_size=128):
         super(CNNModel, self).__init__()
 
         self.features = nn.Sequential(
-            nn.Conv2d(1, 32, kernel_size=5, stride=1, padding=1),
+            nn.Conv2d(1, 32, kernel_size=5, stride=1, padding=2),
             nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
             nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(64, 128, kernel_size=3, stride=1),
+            nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=3, stride=2),
-            nn.Conv2d(128, 196, kernel_size=3, stride=1),
+            nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),
             nn.ReLU(inplace=True),
-            nn.BatchNorm2d(196),
+            nn.BatchNorm2d(256),
             nn.MaxPool2d(kernel_size=2, stride=2),
         )
 
@@ -26,16 +26,17 @@ class CNNModel(nn.Module):
 
         # calculate shape by doing one forward pass
         with torch.no_grad():
-            dummy = torch.ones(1, 1, 128, 128)
+            dummy = torch.ones(1, 1, image_size, image_size)
             self.feature_dim = self._get_conv_out(dummy).view(1, -1).size(1)
 
         self.classifier = nn.Sequential(
-            nn.Linear(self.feature_dim, 512),
+            nn.Linear(self.feature_dim, 1024),
             nn.ReLU(inplace=True),
-            nn.Dropout(p=dropout),
-            nn.Linear(512, 256),
+            nn.Dropout(p=0.6),
+            nn.Linear(1024, 512),
             nn.ReLU(inplace=True),
-            nn.Linear(256, num_classes),
+            nn.Dropout(p=0.6),
+            nn.Linear(512, num_classes),
         )
 
     def _get_conv_out(self, x):

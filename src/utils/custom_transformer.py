@@ -4,7 +4,6 @@ import numpy as np
 
 class SplitAndStackImageToSquare(object):
     def __call__(self, img):
-        # Your function code here:
         width, height = img.size
         num_splits = int(np.ceil(width / np.sqrt(height * width)))
         new_width = height * num_splits

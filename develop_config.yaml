@@ -1,0 +1,32 @@
+{
+  "data": {
+    "batch_size": 32,
+    "image_size": 256,
+    "mean": 0.9432905912399292,
+    "num_workers": 8,
+    "std": 0.133747398853302,
+    "train_data_path": "data/data_sets/Development/Develope_set_204/train",
+    "val_data_path": "data/data_sets/Development/Develope_set_204/val",
+    "test_data_path": "data/data_sets/Development/Develope_set_204/test"
+  },
+  "model": {
+    "model_name": "CNNModel",
+    "num_classes": 204
+  },
+  "module": {
+    "learning_rate": 0.002,
+  },
+  "trainer": {
+    "max_epochs": 150,
+    "precision": "16-mixed",
+    "log_every_n_steps": 30
+  },
+  "scheduler": {
+    "monitor": "train_accuracy",
+    "mode": "max",
+    "factor": 0.5,
+    "patience": 8,
+    "threshold": "1e-2",
+    "min_lr": "1e-4"
+  }
+}

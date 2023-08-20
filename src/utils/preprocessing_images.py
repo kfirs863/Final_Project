@@ -73,22 +73,20 @@ def is_mostly_white(img, row_threshold=0.87, p_t=0.97, border_exclude=700):
 
 def split_rows(img, train_ratio, peaks_indices, test_indices, p_t):
     data = []
+    mean_row_height = np.mean(np.diff(peaks_indices)).astype(int)
 
     # iterate the rows in the image by the data['peaks_indices'] values
     for i in range(len(peaks_indices) - 1):
-        row = img[peaks_indices[i]:peaks_indices[i + 1]]
+        row = img[peaks_indices[i]:(peaks_indices[i]+mean_row_height)]
 
-        # skip if peak_indices are equal to test_indices
-        if peaks_indices[i] == test_indices[0] or peaks_indices[i] == test_indices[1]:
+        # check if peaks_indices is between test_indices
+        if (peaks_indices[i]+mean_row_height) >= test_indices[0] and (peaks_indices[i]+mean_row_height) <= test_indices[1]:
+            print(f'row {i} is between test_indices')
             continue
 
         # skip if row is not contain text
         if not contains_text(row) or is_mostly_white(row, p_t):
             print(f'row {i} not conatain text')
-            # display image
-            # cv2.imshow('image', row)
-            # cv2.waitKey(0)
-            # cv2.destroyAllWindows()
         else:
             data.append(row)
 
@@ -98,9 +96,6 @@ def split_rows(img, train_ratio, peaks_indices, test_indices, p_t):
 
     # Split data to train, val and test
     test_row = [img[test_indices[0]:test_indices[1]]]
-
-    # shuffle data
-    np.random.shuffle(data)
 
     train_rows = data[:train_end]
     val_rows = data[train_end:]
@@ -156,7 +151,8 @@ def split_image_to_sets(image_file: str, mat_file: str, train_ratio: float, outp
 
 # Usage:
 if __name__ == '__main__':
-    K = 203
+    K = 100
+    ratio = 0.8
     dev_raw_data_paths_dict = {
         'data_rotated_path': {
             'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Testing/1_ImagesRotated',
@@ -171,11 +167,11 @@ if __name__ == '__main__':
             'path': r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Testing/4_ImagesLinesRemoved',
             'pixel_threshold': 0.97}
     }
-
-
-
-    output_folder = fr'/homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Testing/testing_set_{K}_text_detection_filtering'
     data_dark_lines_path = r'/homes/kfirs/PycharmProjects/FinalProject/data/raw_data/Testing/5_DataDarkLines'
+
+
+    output_folder = fr'/homes/kfirs/PycharmProjects/FinalProject/data/data_sets/Testing/Testing_set_{K}_ratio_{ratio}'
+
     # iterate over the dev_raw_data_paths_dict
     for key, value in dev_raw_data_paths_dict.items():
         raw_data_path = value['path']
@@ -186,4 +182,4 @@ if __name__ == '__main__':
                                                                  Path(data_dark_lines_path).glob('*.mat'))):
             if index == K:
                 break
-            split_image_to_sets(str(image_file), str(dark_lines_mat), 0.8, output_folder, p_t=pixel_threshold)
+            split_image_to_sets(str(image_file), str(dark_lines_mat), ratio, output_folder, p_t=pixel_threshold)

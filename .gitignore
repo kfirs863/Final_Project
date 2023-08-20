@@ -1,3 +1,4 @@
 *.jpg
 *.mat
-/data/
+/data/*
+!/data/data_sets/Development/Develope_set_204

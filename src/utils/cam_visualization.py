@@ -130,7 +130,7 @@ def main(config):
         transforms.Grayscale(num_output_channels=1),
         SplitAndStackImageToSquare(),
         transforms.Resize((IMAGE_SIZE, IMAGE_SIZE)),
-        transforms.RandAugment(),
+        # transforms.RandAugment(),
         transforms.ToTensor(),
     ])
 
@@ -142,7 +142,7 @@ def main(config):
     model = CNNModel(num_classes=config["model"]["num_classes"])
 
     # Path to your checkpoint
-    checkpoint_path = '/tmp/pycharm_project_253/hand-writing-classification/c8b7c85bbf7b4613947d87c7baee9fe9/checkpoints/best-epoch=86-val_accuracy=0.99.ckpt'
+    checkpoint_path = '/tmp/pycharm_project_253/hand-writing-classification/8483ec259b8a4826aa9e02eaeec603cd/checkpoints/best-epoch=137-val_accuracy=0.85.ckpt'
 
     # Initialize lightning module
     lightning_module = HandwritingClassifier.load_from_checkpoint(checkpoint_path, model=model, config=config,
@@ -152,9 +152,9 @@ def main(config):
     cam_model = CAMModule(lightning_module)
 
     # Retrieve a sample image from the test dataset
-    selected_class = 15
-
-    for index, (image, class_number) in enumerate(val_dataset):
+    selected_class = 199
+    counter = 0
+    for index, (image, class_number) in enumerate(test_dataset):
         if class_number != selected_class:
             continue
 
@@ -174,7 +174,8 @@ def main(config):
 
         # Visualize activations for the specific image
         visualize_activations(image, lightning_module)
-        if index==3:
+        counter += 1
+        if counter==5:
             break
 
 
